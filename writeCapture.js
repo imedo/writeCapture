@@ -712,14 +712,20 @@
 		var state;
 		doc.write = function(s) {
 			var scriptEl = findLastChild(doc.body);
-			if(scriptEl !== currentScript) {
-				currentScript = scriptEl;
-				autoQ.push(state = {
-					el: scriptEl,
-					out: []
-				});					
-			}
-			state.out.push(s);
+      if (scriptEl) {
+        if(scriptEl !== currentScript) {
+          currentScript = scriptEl;
+          autoQ.push(state = {
+            el: scriptEl,
+            out: []
+          });					
+        };
+        state.out.push(s);
+      } else {
+        // Tag isn't in the documents body.
+        // Use original (blocking) document.write for now.
+        write.call(document, s)
+      };
 		};
 		$.onLoad(function() {			
 			// for each script, append a div immediately after it, 
